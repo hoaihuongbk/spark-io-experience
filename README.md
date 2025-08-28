@@ -12,15 +12,15 @@ A simplified environment for benchmarking Apache Spark I/O performance.
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd spark_io_explore
+git clone https://github.com/hoaihuongbk/spark-io-experience.git
+cd spark-io-experience
 chmod +x start_research_environment.sh
 ```
 
 ### 2. Start the Environment
 
 ```bash
-./start_research_environment.sh
+make start
 ```
 
 This will start a 3-node Spark cluster.
