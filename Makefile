@@ -1,13 +1,15 @@
 # Simple Spark I/O Research Makefile
 
-.PHONY: help start stop benchmark clean status generate-dataset
+.PHONY: help start stop benchmark clean status generate-dataset benchmark-join benchmark-partitioning
 
 help:
 	@echo "🚀 Spark I/O Research - Simple Commands"
 	@echo "======================================="
 	@echo "  start     - Start Spark cluster"
 	@echo "  stop      - Stop cluster"
-	@echo "  benchmark - Run all I/O and optimization benchmarks"
+	@echo "  benchmark - Run all I/O and optimization benchmarks (join and partitioning)"
+	@echo "  benchmark-join - Run only join benchmarks"
+	@echo "  benchmark-partitioning - Run only partitioning benchmarks"
 	@echo "  generate-dataset - Generate TPC-DS data"
 	@echo "  status    - Show cluster status"
 	@echo "  clean     - Clean data and logs"
@@ -24,11 +26,21 @@ stop:
 	@docker-compose down
 
 # Run all I/O and optimization benchmarks
-benchmark:
-	@echo "📊 Running all I/O and optimization benchmarks..."
+benchmark: benchmark-join benchmark-partitioning
+
+# Run only join benchmarks
+benchmark-join:
+	@echo "📊 Running Join Benchmarks..."
 	@docker-compose exec spark-master spark-submit \
 		--master spark://spark-master:7077 \
-		/opt/spark/scripts/benchmark.py
+		/opt/spark/scripts/benchmark_join.py
+
+# Run only partitioning benchmarks
+benchmark-partitioning:
+	@echo "📊 Running Partitioning Benchmarks..."
+	@docker-compose exec spark-master spark-submit \
+		--master spark://spark-master:7077 \
+		/opt/spark/scripts/benchmark_partitioning.py
 
 # Generate TPC-DS data
 generate-dataset:

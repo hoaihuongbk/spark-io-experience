@@ -36,7 +36,8 @@ This command will execute a series of I/O and optimization benchmarks.
 
 ## 📈 Benchmark Results and Insights
 
-- [Spark I/O and Read Latency Optimization](benchmark_results_report.md).
+- [Spark Join Optimization Benchmarks](benchmark_join_results.md)
+- [Spark Partitioning Optimization Benchmarks](benchmark_partitioning_results.md)
 
 ## 🧹 Clean Up
 
