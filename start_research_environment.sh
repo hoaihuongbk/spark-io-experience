@@ -20,18 +20,14 @@ if ! command -v docker-compose &> /dev/null; then
     exit 1
 fi
 
-
-
 # Create necessary directories if they don't exist
 echo "📁 Creating necessary directories..."
-mkdir -p data logs configs notebooks scripts research
+mkdir -p data logs
 
 # Set proper permissions
 echo "🔐 Setting proper permissions..."
 chmod 755 scripts/*.py
 chmod 644 configs/*.conf
-
-
 
 # Start the Spark cluster
 echo "🐳 Starting Spark cluster with Docker Compose..."
@@ -45,25 +41,19 @@ sleep 30
 echo "🔍 Checking service status..."
 docker-compose ps
 
-# Get Jupyter access token
-echo "🔑 Getting Jupyter access information..."
-JUPYTER_CONTAINER=$(docker-compose ps -q jupyter)
-if [ ! -z "$JUPYTER_CONTAINER" ]; then
-    echo "📊 Jupyter Lab is starting up..."
-    echo "   Access URL: http://localhost:8888"
-    echo "   Token authentication is enabled for security"
-    echo ""
-    echo "   To get the access token, run:"
-    echo "   docker-compose logs jupyter | grep 'token='"
-    echo ""
-    echo "   Or check the logs:"
-    echo "   docker-compose logs jupyter"
-fi
 
-# Show Spark UI information
-echo "📈 Spark UI Information:"
-echo "   Master UI: http://localhost:8080"
-echo "   Master URL: spark://localhost:7077"
+# Build TPC-DS data generator image
+echo "🏗️ Building TPC-DS data generator image..."
+docker build -t tpcds-generator -f tpcds.Dockerfile .
+
+# Generate TPC-DS data
+echo "📊 Generating TPC-DS data (Scale 1)..."
+docker run --rm -v "$(pwd)/data:/data" tpcds-generator dsdgen -SCALE 1 -DIR /data
+
+# Run data ingestion and table setup scripts
+echo "⚙️ Ingesting TPC-DS data and setting up optimized tables..."
+docker-compose exec spark-master spark-submit --master spark://spark-master:7077 /opt/spark/scripts/ingest_tpcds_data.py
+docker-compose exec spark-master spark-submit --master spark://spark-master:7077 /opt/spark/scripts/setup_optimized_tables.py
 
 echo ""
 echo "✅ Cluster starting! Wait a few minutes, then:"

@@ -1,3 +1,0 @@
-[submodule "tpcds-kit"]
-	path = tpcds-kit
-	url = https://github.com/databricks/tpcds-kit.git

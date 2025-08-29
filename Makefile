@@ -1,15 +1,14 @@
 # Simple Spark I/O Research Makefile
 
-.PHONY: help start stop benchmark test status clean
+.PHONY: help start stop benchmark clean status
 
 help:
 	@echo "🚀 Spark I/O Research - Simple Commands"
 	@echo "======================================="
 	@echo "  start     - Start Spark cluster"
 	@echo "  stop      - Stop cluster"
-	@echo "  benchmark - Run benchmarks in cluster"
-	@echo "  test      - Test cluster"
-	@echo "  status    - Show status"
+	@echo "  benchmark - Run all I/O and optimization benchmarks"
+	@echo "  status    - Show cluster status"
 	@echo "  clean     - Clean data and logs"
 	@echo "  help      - Show this help"
 
@@ -23,48 +22,12 @@ stop:
 	@echo "🛑 Stopping cluster..."
 	@docker-compose down
 
-
-
-# Run benchmarks in cluster
+# Run all I/O and optimization benchmarks
 benchmark:
-	@echo "📊 Running shuffle compression disabled benchmark..."
+	@echo "📊 Running all I/O and optimization benchmarks..."
 	@docker-compose exec spark-master spark-submit \
 		--master spark://spark-master:7077 \
-		--conf spark.shuffle.compress=false \
-		--conf spark.shuffle.spill.compress=false \
-		/opt/spark/scripts/unified_benchmark.py shuffle_disabled
-
-	@echo "📊 Running shuffle compression enabled benchmark..."
-	@docker-compose exec spark-master spark-submit \
-		--master spark://spark-master:7077 \
-		--conf spark.shuffle.compress=true \
-		--conf spark.shuffle.spill.compress=true \
-		/opt/spark/scripts/unified_benchmark.py shuffle_enabled
-
-	@echo "📊 Running I/O Snappy benchmark..."
-	@docker-compose exec spark-master spark-submit \
-		--master spark://spark-master:7077 \
-		--conf spark.sql.parquet.compression.codec=snappy \
-		/opt/spark/scripts/unified_benchmark.py io_snappy snappy
-
-	@echo "📊 Running I/O Gzip benchmark..."
-	@docker-compose exec spark-master spark-submit \
-		--master spark://spark-master:7077 \
-		--conf spark.sql.parquet.compression.codec=gzip \
-		/opt/spark/scripts/unified_benchmark.py io_gzip gzip
-
-	@echo "📊 Running I/O Zstd benchmark..."
-	@docker-compose exec spark-master spark-submit \
-		--master spark://spark-master:7077 \
-		--conf spark.sql.parquet.compression.codec=zstd \
-		/opt/spark/scripts/unified_benchmark.py io_zstd zstd
-
-
-
-# Test cluster
-test:
-	@echo "🧪 Testing cluster..."
-	
+		/opt/spark/scripts/benchmark.py
 
 # Clean data and logs
 clean:
@@ -75,4 +38,3 @@ clean:
 status:
 	@echo "📊 Cluster status:"
 	@docker-compose ps
-
